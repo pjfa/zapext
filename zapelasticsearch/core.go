@@ -27,37 +27,37 @@ type Core struct {
 	client6 *elasticsearch6.Client
 	client7 *elasticsearch7.Client
 	client8 *elasticsearch8.Client
-	esIndex string
+	getIndex func() string
 }
 
 // NewCore6 new logger Core for elastic search v6
-func NewCore6(enabler zapcore.LevelEnabler, encoderConfig zapcore.EncoderConfig, client *elasticsearch6.Client, esIndex string) *Core {
+func NewCore6(enabler zapcore.LevelEnabler, encoderConfig zapcore.EncoderConfig, client *elasticsearch6.Client, getIndex func() string) *Core {
 	newCore := &Core{
 		LevelEnabler: enabler,
 		client6:      client,
-		esIndex:      esIndex,
+		getIndex:      getIndex,
 	}
 	initiateEncoder(newCore, encoderConfig)
 	return newCore
 }
 
 // NewCore7 new logger Core for elastic search v7
-func NewCore7(enabler zapcore.LevelEnabler, encoderConfig zapcore.EncoderConfig, client *elasticsearch7.Client, esIndex string) *Core {
+func NewCore7(enabler zapcore.LevelEnabler, encoderConfig zapcore.EncoderConfig, client *elasticsearch7.Client, getIndex func() string) *Core {
 	newCore := &Core{
 		LevelEnabler: enabler,
 		client7:      client,
-		esIndex:      esIndex,
+		getIndex:      getIndex,
 	}
 	initiateEncoder(newCore, encoderConfig)
 	return newCore
 }
 
 // NewCore8 new logger Core for elastic search v8
-func NewCore8(enabler zapcore.LevelEnabler, encoderConfig zapcore.EncoderConfig, client *elasticsearch8.Client, esIndex string) *Core {
+func NewCore8(enabler zapcore.LevelEnabler, encoderConfig zapcore.EncoderConfig, client *elasticsearch8.Client, getIndex func() string) *Core {
 	newCore := &Core{
 		LevelEnabler: enabler,
 		client8:      client,
-		esIndex:      esIndex,
+		getIndex:      getIndex,
 	}
 	initiateEncoder(newCore, encoderConfig)
 	return newCore
@@ -98,7 +98,7 @@ func (core *Core) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	if core.client6 != nil {
 		req := esapi6.IndexRequest{
-			Index:   core.esIndex,
+			Index:   core.getIndex(),
 			Body:    strings.NewReader(buffer.String()),
 			Refresh: "true",
 		}
@@ -116,7 +116,7 @@ func (core *Core) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	if core.client7 != nil {
 		req := esapi7.IndexRequest{
-			Index:   core.esIndex,
+			Index:   core.getIndex(),
 			Body:    strings.NewReader(buffer.String()),
 			Refresh: "true",
 		}
@@ -134,7 +134,7 @@ func (core *Core) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	if core.client8 != nil {
 		req := esapi8.IndexRequest{
-			Index:   core.esIndex,
+			Index:   core.getIndex(),
 			Body:    strings.NewReader(buffer.String()),
 			Refresh: "true",
 		}
